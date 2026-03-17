@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useMessageStore } from '@/stores/messageStore'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
 
@@ -7,6 +7,18 @@ const messageStore = useMessageStore()
 const breadcrumb = useBreadcrumbStore()
 
 const selectedMessage = ref(null)
+const searchQuery = ref('')
+
+const filteredMessages = computed(() => {
+  if (!searchQuery.value) return messageStore.messages
+  const query = searchQuery.value.toLowerCase()
+  return messageStore.messages.filter(
+    (msg) =>
+      (msg.name || '').toLowerCase().includes(query) ||
+      (msg.email || '').toLowerCase().includes(query) ||
+      (msg.company || '').toLowerCase().includes(query),
+  )
+})
 
 onMounted(() => {
   breadcrumb.set([
@@ -57,13 +69,26 @@ const handleDelete = async (messageId) => {
   <div class="flex h-screen bg-slate-100 font-sans">
     <!-- Message List -->
     <div
-      class="w-full md:w-1/3 lg:w-1/4 border-r border-slate-200 bg-white flex flex-col"
+      class="md:w-1/3 lg:w-1/4 border-r border-slate-200 bg-white flex-col"
+      :class="selectedMessage ? 'hidden md:flex' : 'flex w-full'"
     >
       <div class="p-4 border-b border-slate-200">
         <h2 class="text-xl font-bold text-slate-800">Inbox</h2>
-        <p class="text-sm text-slate-500">
+        <p class="text-sm text-slate-500 mb-3">
           {{ messageStore.unreadCount }} unread messages
         </p>
+        <div class="relative">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search messages..."
+            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          />
+          <span
+            class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]"
+            >search</span
+          >
+        </div>
       </div>
       <div class="overflow-y-auto grow">
         <div
@@ -73,14 +98,14 @@ const handleDelete = async (messageId) => {
           Loading messages...
         </div>
         <div
-          v-else-if="!messageStore.messages.length"
+          v-else-if="!filteredMessages.length"
           class="p-6 text-center text-slate-500"
         >
-          No messages yet.
+          {{ searchQuery ? 'No matching messages found.' : 'No messages yet.' }}
         </div>
         <ul v-else>
           <li
-            v-for="message in messageStore.messages"
+            v-for="message in filteredMessages"
             :key="message.id"
             @click="selectMessage(message)"
             class="p-4 border-b border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors duration-150"
@@ -111,27 +136,38 @@ const handleDelete = async (messageId) => {
     </div>
 
     <!-- Message Viewer -->
-    <div class="hidden md:flex w-2/3 lg:w-3/4 flex-col">
+    <div
+      class="flex-col md:flex md:w-2/3 lg:w-3/4"
+      :class="selectedMessage ? 'flex w-full' : 'hidden'"
+    >
       <div v-if="selectedMessage" class="grow flex flex-col bg-slate-50">
         <!-- Header -->
         <div
           class="p-4 border-b border-slate-200 bg-white flex justify-between items-center flex-wrap gap-2"
         >
-          <div>
-            <h3 class="text-lg font-bold text-slate-800">
-              {{ selectedMessage.name }}
-            </h3>
-            <p class="text-sm text-slate-500">
-              From:
-              <a
-                :href="`mailto:${selectedMessage.email}`"
-                class="text-blue-600 hover:underline"
-                >{{ selectedMessage.email }}</a
-              >
-            </p>
-            <p v-if="selectedMessage.company" class="text-sm text-slate-500">
-              Company: {{ selectedMessage.company }}
-            </p>
+          <div class="flex items-start gap-3">
+            <button
+              @click="selectedMessage = null"
+              class="md:hidden p-1 text-slate-500 hover:bg-slate-100 rounded-full"
+            >
+              <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <div>
+              <h3 class="text-lg font-bold text-slate-800">
+                {{ selectedMessage.name }}
+              </h3>
+              <p class="text-sm text-slate-500">
+                From:
+                <a
+                  :href="`mailto:${selectedMessage.email}`"
+                  class="text-blue-600 hover:underline"
+                  >{{ selectedMessage.email }}</a
+                >
+              </p>
+              <p v-if="selectedMessage.company" class="text-sm text-slate-500">
+                Company: {{ selectedMessage.company }}
+              </p>
+            </div>
           </div>
           <div class="flex items-center gap-2">
             <button

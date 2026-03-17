@@ -1,16 +1,26 @@
 <script setup>
+import { onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import Logo from '@/components/logo/Logo.vue'
+import GlobalLoader from '@/components/common/GlobalLoader.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 
 const authStore = useAuthStore()
 const settingsStore = useSettingsStore()
+
+// Clear any lingering auth errors when the user navigates away from this page.
+onUnmounted(() => {
+  if (authStore.authError) {
+    authStore.authError = null
+  }
+})
 </script>
 
 <template>
   <div
     class="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 to-slate-100"
   >
+    <GlobalLoader />
     <div class="w-full max-w-sm text-center px-6">
       <div class="mb-6 flex flex-col items-center gap-4">
         <Logo />
@@ -20,6 +30,16 @@ const settingsStore = useSettingsStore()
         class="bg-white p-8 rounded-2xl shadow-lg border border-slate-800/10"
       >
         <h3 class="font-medium text-slate-400 mb-8">Identify Yourself</h3>
+
+        <!-- Authentication Error Message -->
+        <div
+          v-if="authStore.authError"
+          class="bg-red-100 border-l-4 border-red-500 text-red-800 p-4 mb-6 text-left text-sm"
+          role="alert"
+        >
+          <p class="font-bold">Authentication Failed</p>
+          <p>{{ authStore.authError }}</p>
+        </div>
 
         <button
           @click="authStore.loginWithGoogle"

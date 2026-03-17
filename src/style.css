@@ -411,3 +411,32 @@ trix-editor h3 {
 trix-editor a {
   @apply text-blue-600 underline;
 }
+
+/* --- Global Icon Loading States (Skeleton Loader) --- */
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.material-symbols-outlined {
+  transition: all 0.3s ease-out;
+}
+
+.icons-loading .material-symbols-outlined {
+  color: transparent !important;
+  background-color: #cbd5e1; /* slate-300 */
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  border-radius: 4px;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  overflow: hidden;
+  pointer-events: none;
+}

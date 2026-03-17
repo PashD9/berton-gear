@@ -9,7 +9,6 @@ import {
   onAuthStateChanged,
   setPersistence,
   browserLocalPersistence,
-  browserSessionPersistence,
 } from 'firebase/auth'
 import {
   doc,
@@ -34,6 +33,7 @@ export const useAuthStore = defineStore('authStore', () => {
   const router = useRouter()
   const utils = useUtilityStore()
   const isAuthReady = ref(false) // Prevents flickering on page refresh
+  const authError = ref(null)
   let initPromise = null
 
   // Initialize and listen for the bouncer
@@ -84,6 +84,8 @@ export const useAuthStore = defineStore('authStore', () => {
           await signOut(auth)
           user.value = null
           isAdmin.value = false
+          authError.value =
+            'Your account has been disabled. Please contact an administrator.'
           utils.triggerToast('Your account has been disabled.', 'error')
           return
         }
@@ -121,25 +123,35 @@ export const useAuthStore = defineStore('authStore', () => {
   }
 
   const loginWithGoogle = async () => {
+    authError.value = null // Clear previous errors
     utils.setLoading(true)
     const provider = new GoogleAuthProvider()
     try {
+      await setPersistence(auth, browserLocalPersistence)
       const result = await signInWithPopup(auth, provider)
       if (result.user) {
         await syncUserToFirestore(result.user)
       }
-      router.push('/dashboard')
+      // If syncUserToFirestore set an error (e.g. disabled account), don't redirect.
+      if (!authError.value) {
+        router.push('/dashboard')
+      }
     } catch (error) {
       if (error.code === 'auth/popup-blocked') {
-        try {
-          await signInWithRedirect(auth, provider)
-        } catch (e) {
-          console.error('Redirect Error:', e)
-          utils.triggerToast('Authentication failed', 'error')
-        }
+        authError.value =
+          'Popup blocked. Please enable popups for this site and try again.'
+        utils.triggerToast(authError.value, 'warning')
+      } else if (
+        error.code === 'auth/cancelled-popup-request' ||
+        error.code === 'auth/popup-closed-by-user'
+      ) {
+        // User closed the popup, not really an "error" to display. Silently ignore.
+        console.log('User cancelled the Google sign-in flow.')
       } else {
-        console.error('Auth Error:', error.code)
-        utils.triggerToast(error.message, 'error')
+        console.error('Auth Error:', error.code, error.message)
+        authError.value =
+          'An unknown error occurred during sign-in. Please try again.'
+        utils.triggerToast('Authentication failed', 'error')
       }
     } finally {
       utils.setLoading(false)
@@ -157,13 +169,11 @@ export const useAuthStore = defineStore('authStore', () => {
       authChannel.postMessage('logout')
     }
 
-    // After signOut, try to set persistence to local. This ensures that any expired
-    // or invalid tokens are cleared from localStorage, preventing the user
-    // from being re-authenticated on refresh.
+    // After signOut, ensure persistence is reset to local for future sessions.
     try {
       await setPersistence(auth, browserLocalPersistence)
     } catch (error) {
-      console.warn('Could not clear local persistence on logout:', error)
+      console.warn('Could not set local persistence on logout:', error)
     } finally {
       isAdmin.value = false
       allUsers.value = []
@@ -284,6 +294,7 @@ export const useAuthStore = defineStore('authStore', () => {
     isAdmin,
     allUsers,
     isAuthReady,
+    authError,
     init,
     loginWithGoogle,
     logout,

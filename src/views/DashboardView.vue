@@ -14,8 +14,8 @@ const INACTIVITY_TIMEOUT = parseInt(
   import.meta.env.PHA_ADMIN_INACTIVITY_TIMEOUT_MS || '1800000',
 ) // 30 minutes
 const WARNING_TIMEOUT = parseInt(
-  import.meta.env.PHA_ADMIN_WARNING_TIMEOUT_MS || '1200000',
-) // 20 minutes
+  import.meta.env.PHA_ADMIN_WARNING_TIMEOUT_MS || '900000',
+) // 15 minutes
 
 let inactivityTimer = null
 let warningTimer = null
