@@ -1,0 +1,1 @@
+import{_ as s}from"./GlobalLoader-Cr30aArq.js";import{c as a,f as e,d as t,s as c,b as r}from"./index-DXBotdSo.js";const n={class:"flex flex-col min-h-screen bg-gray-100"},_={class:"grow"},f={__name:"DashboardLayout",setup(m){return(i,l)=>{const o=c("RouterView");return r(),a("div",n,[e(s),t("main",_,[e(o)])])}}};export{f as default};
