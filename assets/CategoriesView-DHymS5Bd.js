@@ -1,0 +1,1 @@
+import{d as e}from"./vue-router-D83JzFNA.js";import{H as r,z as o,G as t}from"./@vue-DoMqcLjI.js";import"./lodash-D992252h.js";const m={__name:"CategoriesView",setup(a){return(s,c)=>(t(),r(o(e)))}};export{m as default};

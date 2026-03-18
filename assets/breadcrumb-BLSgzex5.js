@@ -1,0 +1,1 @@
+import{d as u}from"./pinia-zrd6ia6V.js";import{c}from"./@vue-DoMqcLjI.js";const d=u("breadcrumb",()=>{const e=c([]);function t(r){e.value=r}function s(r){e.value.some(o=>o.path===r.path)||e.value.push(r)}function a(){e.value=[]}return{breadcrumbs:e,set:t,add:s,clear:a}});export{d as u};

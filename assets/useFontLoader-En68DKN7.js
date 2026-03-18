@@ -1,0 +1,1 @@
+import{c as t,L as n}from"./@vue-DoMqcLjI.js";function u(){const e=t(!1);return typeof document<"u"&&document.fonts&&document.fonts.check('1em "Material Symbols Outlined"')&&(e.value=!0),n(()=>{e.value||document.fonts.ready.then(()=>{e.value=!0})}),{areIconsLoaded:e}}export{u};

@@ -1,0 +1,1 @@
+import{d as r}from"./vue-router-D83JzFNA.js";import{H as e,z as o,G as t}from"./@vue-DoMqcLjI.js";import"./lodash-D992252h.js";const n={__name:"ProductsView",setup(a){return(s,c)=>(t(),e(o(r)))}};export{n as default};
