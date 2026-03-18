@@ -1,1 +1,0 @@
-import{Z as o,r as n}from"./index-DHXCq1Yb.js";const i=o("breadcrumb",()=>{const e=n([]);function s(r){e.value=r}function t(r){e.value.some(u=>u.path===r.path)||e.value.push(r)}function a(){e.value=[]}return{breadcrumbs:e,set:s,add:t,clear:a}});export{i as u};

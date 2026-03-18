@@ -1,1 +1,0 @@
-import{r as o,o as t}from"./index-DHXCq1Yb.js";function u(){const e=o(!1);return typeof document<"u"&&document.fonts&&document.fonts.check('1em "Material Symbols Outlined"')&&(e.value=!0),t(()=>{e.value||document.fonts.ready.then(()=>{e.value=!0})}),{areIconsLoaded:e}}export{u};
